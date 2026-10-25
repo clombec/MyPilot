@@ -16,6 +16,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
 
+def _env(name: str, default: str = "") -> str:
+    """Read an environment variable, treating an empty value as missing.
+
+    `.env.example` lists every variable with an empty value: an empty
+    `DATABASE_PATH=` must fall back to the default, not to an empty path.
+
+    Args:
+        name: Environment variable name.
+        default: Value used when the variable is missing or empty.
+
+    Returns:
+        The stripped value, or the default.
+    """
+    return os.environ.get(name, "").strip() or default
+
+
 def _env_list(name: str, default: str = "") -> list[str]:
     """Split a comma or semicolon separated environment variable into a list.
 
@@ -26,12 +42,12 @@ def _env_list(name: str, default: str = "") -> list[str]:
     Returns:
         List of non-empty, stripped items.
     """
-    raw = os.environ.get(name, default)
+    raw = _env(name, default)
     return [item.strip() for item in raw.replace(";", ",").split(",") if item.strip()]
 
 
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "change-me-in-production")
-DEBUG = os.environ.get("DEBUG", "True") == "True"
+SECRET_KEY = _env("DJANGO_SECRET_KEY", "change-me-in-production")
+DEBUG = _env("DEBUG", "True") == "True"
 ALLOWED_HOSTS = _env_list("ALLOWED_HOSTS", "localhost,127.0.0.1")
 
 INSTALLED_APPS = [
@@ -81,7 +97,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": Path(os.environ.get("DATABASE_PATH", BASE_DIR / "data" / "pilotage.sqlite3")),
+        "NAME": Path(_env("DATABASE_PATH", str(BASE_DIR / "data" / "pilotage.sqlite3"))),
         "OPTIONS": {
             "init_command": "PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL;",
             "transaction_mode": "IMMEDIATE",
@@ -98,7 +114,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = "fr-fr"
-TIME_ZONE = os.environ.get("TIMEZONE", "Europe/Paris")
+TIME_ZONE = _env("TIMEZONE", "Europe/Paris")
 USE_I18N = True
 USE_TZ = True
 
@@ -117,13 +133,13 @@ LOGOUT_REDIRECT_URL = "web:login"
 
 # --- Project settings -------------------------------------------------------
 
-API_TOKEN = os.environ.get("API_TOKEN", "")
+API_TOKEN = _env("API_TOKEN")
 EXPORT_DIRS = [Path(p) for p in _env_list("EXPORT_DIRS")]
-EXPORT_KEEP_JSON = int(os.environ.get("EXPORT_KEEP_JSON", "30"))
+EXPORT_KEEP_JSON = int(_env("EXPORT_KEEP_JSON", "30"))
 
 # --- Logging ----------------------------------------------------------------
 
-LOG_DIR = Path(os.environ.get("LOG_DIR", BASE_DIR / "logs"))
+LOG_DIR = Path(_env("LOG_DIR", str(BASE_DIR / "logs")))
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 (BASE_DIR / "data").mkdir(parents=True, exist_ok=True)
 
@@ -147,5 +163,5 @@ LOGGING = {
             "formatter": "default",
         },
     },
-    "root": {"handlers": ["console", "file"], "level": os.environ.get("LOG_LEVEL", "INFO")},
+    "root": {"handlers": ["console", "file"], "level": _env("LOG_LEVEL", "INFO")},
 }

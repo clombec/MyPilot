@@ -15,7 +15,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from core import services
-from core.models import Briefing, Note, Project, Task
+from core.models import AuditLog, Briefing, Note, Project, Proposal, ReviewStatus, Task
+from core.undo import undo_entry
 
 from .forms import CaptureForm, NoteForm, QuickNoteForm, TaskForm
 
@@ -180,3 +181,57 @@ def note_edit(request: HttpRequest, note_id: int | None = None) -> HttpResponse:
         form = NoteForm(instance=note)
     context = {"form": form, "note": note, "active_tab": "notes"}
     return render(request, "web/note_edit.html", context)
+
+
+AUDIT_PAGE_SIZE = 100
+DECIDED_PROPOSALS = 20
+
+
+@login_required
+@require_GET
+def proposal_list(request: HttpRequest) -> HttpResponse:
+    """Pending proposals of the agent, and the latest decided ones."""
+    qs = Proposal.objects.select_related("rule", "profile_version", "briefing_spec", "task")
+    context = {
+        "pending": qs.filter(status=ReviewStatus.PROPOSED),
+        "decided": qs.exclude(status=ReviewStatus.PROPOSED)[:DECIDED_PROPOSALS],
+        "active_tab": "proposals",
+    }
+    return render(request, "web/proposals.html", context)
+
+
+@login_required
+@require_POST
+def proposal_decide(request: HttpRequest, proposal_id: int) -> HttpResponse:
+    """Accept or refuse a proposal (same effect as the Discord buttons)."""
+    proposal = get_object_or_404(Proposal, pk=proposal_id)
+    accept = request.POST.get("decision") == "accept"
+    try:
+        services.decide_proposal(proposal, accept)
+    except ValueError:
+        messages.error(request, "Proposition déjà traitée.")
+    else:
+        messages.success(request, "Proposition acceptée." if accept else "Proposition refusée.")
+    return redirect("web:proposal_list")
+
+
+@login_required
+@require_GET
+def audit_list(request: HttpRequest) -> HttpResponse:
+    """Journal of the agent's writes, newest first."""
+    entries = AuditLog.objects.all()[:AUDIT_PAGE_SIZE]
+    return render(request, "web/audit.html", {"entries": entries, "active_tab": "audit"})
+
+
+@login_required
+@require_POST
+def audit_undo(request: HttpRequest, entry_id: int) -> HttpResponse:
+    """Undo one write of the agent."""
+    entry = get_object_or_404(AuditLog, pk=entry_id, actor="agent")
+    try:
+        undo_entry(entry)
+    except ValueError:
+        messages.error(request, "Cette écriture ne peut pas être annulée.")
+    else:
+        messages.success(request, f"Annulé : {entry.result}")
+    return redirect("web:audit_list")

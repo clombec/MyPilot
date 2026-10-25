@@ -1,0 +1,42 @@
+{% extends "web/base.html" %}
+{% block title %}Propositions · Pilotage{% endblock %}
+{% block content %}
+<h1>Propositions de l'agent</h1>
+{% for p in pending %}
+<div class="card">
+  <div class="muted">#{{ p.pk }} · {{ p.get_kind_display }} · {{ p.created_at|date:"d/m H:i" }}</div>
+  {% if p.rule %}
+    <p><strong>{{ p.rule.text }}</strong><br>Quand : {{ p.rule.trigger|default:"?" }}<br>Message : {{ p.rule.message|default:"?" }}</p>
+  {% elif p.profile_version %}
+    <div class="raw">{{ p.profile_version.content }}</div>
+  {% elif p.briefing_spec %}
+    <div class="raw">{{ p.briefing_spec.content }}</div>
+  {% elif p.task %}
+    <p>Abandonner <a href="{% url 'web:task_detail' p.task.pk %}">#{{ p.task.pk }} {{ p.task.title }}</a> ?</p>
+  {% endif %}
+  {% if p.rationale %}<p class="muted">Pourquoi : {{ p.rationale }}</p>{% endif %}
+  <form method="post" action="{% url 'web:proposal_decide' p.pk %}" class="inline">
+    {% csrf_token %}
+    <button type="submit" name="decision" value="accept">Accepter</button>
+    <button type="submit" name="decision" value="reject" class="secondary">Refuser</button>
+  </form>
+</div>
+{% empty %}
+<div class="card muted">Aucune proposition en attente.</div>
+{% endfor %}
+
+{% if decided %}
+<h2>Déjà traitées</h2>
+<div class="card">
+  <ul class="rows">
+    {% for p in decided %}
+    <li><div class="main">
+      #{{ p.pk }} {{ p.get_kind_display }}
+      {% if p.rule %}: {{ p.rule.text }}{% elif p.task %}: {{ p.task.title }}{% endif %}
+      <div><span class="badge">{{ p.get_status_display }}</span><span class="badge">{{ p.decided_at|date:"d/m H:i" }}</span></div>
+    </div></li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+{% endblock %}

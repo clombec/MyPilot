@@ -1,5 +1,7 @@
 Django==5.2.18
+discord.py==2.7.1
 django-ninja==1.7.1
+mcp==2.3.0
 python-dotenv==1.2.4
 waitress==3.0.2
 whitenoise==6.12.0

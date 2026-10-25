@@ -14,6 +14,8 @@
     <a href="{% url 'web:home' %}" class="{% if active_tab == 'home' %}active{% endif %}">Accueil</a>
     <a href="{% url 'web:task_list' %}" class="{% if active_tab == 'tasks' %}active{% endif %}">Tâches</a>
     <a href="{% url 'web:note_list' %}" class="{% if active_tab == 'notes' %}active{% endif %}">Notes</a>
+    <a href="{% url 'web:proposal_list' %}" class="{% if active_tab == 'proposals' %}active{% endif %}">Propositions</a>
+    <a href="{% url 'web:audit_list' %}" class="{% if active_tab == 'audit' %}active{% endif %}">Journal</a>
   </nav>
 </header>
 {% endif %}

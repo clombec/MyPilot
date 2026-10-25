@@ -1,0 +1,30 @@
+{% extends "web/base.html" %}
+{% block title %}Journal · Pilotage{% endblock %}
+{% block content %}
+<h1>Journal de l'agent</h1>
+<p class="muted">Chaque écriture de l'agent, de la plus récente à la plus ancienne. « Annuler » a le même effet que <code>/annuler</code>, pour une ligne précise.</p>
+<div class="card">
+  <ul class="rows">
+    {% for e in entries %}
+    <li>
+      <div class="main">
+        <div>{{ e.result|default:e.tool }}</div>
+        <div>
+          <span class="badge">{{ e.created_at|date:"d/m H:i" }}</span>
+          <span class="badge">{{ e.tool }}</span>
+          <span class="badge">{{ e.get_actor_display }}</span>
+          {% if e.undone %}<span class="badge due">annulé</span>{% endif %}
+        </div>
+      </div>
+      {% if e.actor == 'agent' and not e.undone and e.undo_data %}
+      <form method="post" action="{% url 'web:audit_undo' e.pk %}">
+        {% csrf_token %}<button type="submit" class="secondary">Annuler</button>
+      </form>
+      {% endif %}
+    </li>
+    {% empty %}
+    <li class="muted">Aucune écriture pour l'instant.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

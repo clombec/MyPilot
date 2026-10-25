@@ -74,3 +74,34 @@ class WebTests(TestCase):
         self.assertEqual(Note.objects.get().tags, ["mnemos", "cabinet"])
         response = self.client.get(reverse("web:note_list"), {"q": "Mnemos"})
         self.assertContains(response, "Facturation")
+
+
+class AgentPagesTests(TestCase):
+    def setUp(self) -> None:
+        user = get_user_model().objects.create_user("moi", password="mot-de-passe-long")
+        self.client.force_login(user)
+
+    def test_accept_proposal_from_web(self) -> None:
+        from core import agent_tools
+        from core.models import Proposal, Rule
+
+        agent_tools.propose_rule("Rappeler les clés", "les jours cabinet", "Clés !")
+        proposal = Proposal.objects.get()
+        page = self.client.get(reverse("web:proposal_list"))
+        self.assertContains(page, "Rappeler les clés")
+        self.client.post(
+            reverse("web:proposal_decide", args=[proposal.pk]), {"decision": "accept"}
+        )
+        self.assertTrue(Rule.objects.get().active)
+
+    def test_undo_from_journal(self) -> None:
+        from core import agent_tools
+        from core.models import AuditLog
+
+        agent_tools.create_task("créée par l'agent")
+        entry = AuditLog.objects.get(tool="create_task")
+        self.assertContains(self.client.get(reverse("web:audit_list")), "Annuler")
+        self.client.post(reverse("web:audit_undo", args=[entry.pk]))
+        self.assertEqual(Task.objects.count(), 0)
+        entry.refresh_from_db()
+        self.assertTrue(entry.undone)

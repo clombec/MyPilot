@@ -6,32 +6,35 @@ Coffre de données personnel + agent Claude + bot Discord pour piloter cinq acti
 
 **Principe directeur** : le code enregistre, partage et montre les données. Il ne planifie
 rien. Toute la gestion (priorités, propositions, rappels, clarification) est faite par
-Claude (Claude Code local, phase 2).
+Claude, via Claude Code exécuté en local (`claude -p`).
 
 ## État d'avancement
 
 | Phase | Contenu | État |
 |---|---|---|
 | 1 | Modèles, API, interface minimale, `import_raw`, `export_snapshot` / `restore`, tests | ✅ fait |
-| 2 | Bot Discord, serveur MCP `pilotage`, `ClaudeCodeBackend`, briefing | à faire |
+| 2 | Bot Discord, serveur MCP `pilotage`, `ClaudeCodeBackend`, briefing, `/annuler`, propositions | ✅ fait |
 | 3 | Revue hebdo, résumés, mode Mac, `import_json` | à faire |
 
-Le catalogue des outils de l'agent (phase 2) est suivi dans `outils_agent.xlsx`.
+Le catalogue des outils de l'agent est suivi dans `outils_agent.xlsx` (les 22 outils prévus
+existent, plus `list_projects` et `get_briefing_spec`).
 
 ## Arborescence
 
 ```
 Pilot/
 ├── config/            réglages Django, URLs racine, WSGI
-├── core/              modèles (§4), services de données, import, export, snapshot
-│   ├── management/commands/   import_raw, export_snapshot, restore
+├── core/              modèles (§4), services de données, import, export, snapshot,
+│   │                  outils de l'agent (agent_tools.py), annulation (undo.py)
+│   ├── management/commands/   import_raw, export_snapshot, restore, run_bot, agent_check
 │   └── tests/
 ├── api/               API REST (django-ninja), jeton Bearer
 ├── web/               interface web mobile (gabarits Django + HTMX)
 ├── docs/DECISIONS.md  décisions techniques
-├── bot/               (phase 2) bot Discord + planificateur
-├── agent/             (phase 2) serveur MCP + ClaudeCodeBackend
-└── agent_workspace/   (phase 2) dossier de travail de l'agent : CLAUDE.md, mcp_config.json
+├── bot/               bot Discord : commandes, salons, boutons, planificateur
+├── agent/             serveur MCP `pilotage`, ClaudeCodeBackend, service (sessions)
+├── agent_workspace/   CLAUDE.md = prompt système de l'agent (source versionnée)
+└── scripts/windows/   démarrage automatique (tâches planifiées)
 ```
 
 ## Installation (Windows, PC fixe)
@@ -81,7 +84,81 @@ PC, visible avec `tailscale ip -4`, et l'ajouter à `ALLOWED_HOSTS`) :
   est refusé.
 - Admin Django (secours) : `/admin/`.
 
-Le service Windows (bot + web toujours actifs) sera mis en place en phase 2.
+### Bot Discord et agent
+
+Prérequis : §15 de la spec (serveur Discord, bot avec l'intent *Message Content*, IDs dans
+`.env`), et Claude Code installé **et connecté** sur le PC avec ton abonnement (`claude`,
+puis `/login`).
+
+```powershell
+.venv\Scripts\python manage.py agent_check   # 1 appel réel, lecture seule : vérifie toute la chaîne
+.venv\Scripts\python manage.py run_bot       # lance le bot, le planificateur et l'agent
+```
+
+Au démarrage, `run_bot` copie `agent_workspace/CLAUDE.md` et génère `mcp_config.json` dans
+`AGENT_WORKDIR` (par défaut `~/.pilotage/agent_workspace`). Ce dossier doit être **hors du
+dépôt** : Claude Code lit les CLAUDE.md des dossiers parents, et les règles de développement
+ne doivent pas atteindre l'agent. Une valeur dans le dépôt est remplacée par le défaut, avec
+un avertissement dans le journal.
+
+Modifier le comportement de l'agent = modifier `agent_workspace/CLAUDE.md`, puis redémarrer
+le bot. Aucun code à toucher.
+
+### Démarrage automatique (Windows)
+
+Deux tâches planifiées, lancées à l'ouverture de session et relancées en cas d'arrêt :
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\windows\install_tasks.ps1 -ListenAddress 100.x.y.z:8000
+powershell -ExecutionPolicy Bypass -File scripts\windows\install_tasks.ps1 -Remove   # désinstaller
+```
+
+Elles tournent sous ton compte (c'est lui qui est connecté à Claude Code). Le PC doit être
+allumé et la session ouverte pour que le briefing parte. Si le PC était éteint à l'heure du
+briefing, il est envoyé au démarrage du bot (avant midi).
+
+## Discord
+
+| Salon | Rôle |
+|---|---|
+| `#briefing` | point du matin (`BRIEFING_TIME`), relance douce à `BRIEFING_NUDGE_TIME` sans réponse |
+| `#agent` | dialogue libre avec l'agent (une conversation par jour, reprise toute la journée) |
+| `#capture` | chaque message devient une tâche brute (`clab: texte` → projet CLAB) |
+| `#propositions` | consignes, profil, format, abandons proposés par l'agent : Accepter / Refuser |
+
+| Commande | Claude ? | Effet |
+|---|---|---|
+| `/note <texte>` | non | ajoute une observation |
+| `/capture <texte> [projet]` | non | tâche brute |
+| `/statut` | non | compteurs, échéances, propositions en attente |
+| `/annuler` | non | annule la dernière écriture de l'agent |
+| `/fait <n°>` | non | clôt la tâche n° (avec du texte : l'agent retrouve la tâche) |
+| `/briefing-format` | non | spec actuelle + 5 versions, menu pour revenir en arrière |
+| `/now <durée> <énergie> [contexte]` | oui | 2 ou 3 options justifiées |
+| `/jour <focus> [heures] [énergie]` | oui | enregistre la journée, l'agent propose un plan |
+| `/clarifie [n]` | oui | l'agent prend n éléments bruts et pose ses questions |
+| `/semaine` | oui | revue de la semaine |
+| `/briefing` | oui | regénère le briefing dans `#briefing` |
+
+Le bot ignore tout autre utilisateur que `DISCORD_OWNER_ID` et tout autre salon. Si Claude
+est indisponible ou la limite d'usage atteinte, un message clair s'affiche ; les commandes
+sans Claude continuent de marcher et le message saisi est conservé.
+
+### Sécurité de l'agent
+
+L'agent est lancé avec `--tools ""` (aucun outil intégré : ni shell, ni fichiers, ni web),
+`--strict-mcp-config` (seul le serveur `pilotage`), `--permission-mode dontAsk` et
+`--permission-prompts none` (tout ce qui n'est pas autorisé d'avance est refusé). Aucun mode
+de contournement des permissions. `ANTHROPIC_API_KEY`, le jeton Discord, `API_TOKEN` et la
+clé Django sont retirés de son environnement (`AGENT_AUTH=subscription`). Chaque écriture
+est journalisée (`AuditLog`) et annulable (`/annuler`, ou page Journal du web).
+
+### Usage et limites
+
+Connecté avec l'abonnement, `claude -p` puise dans les limites de l'abonnement (fenêtre de
+5 heures et plafond hebdomadaire partagés avec claude.ai et le développement). Vérifié le
+25/10/2026 sur la page d'aide Anthropic « Use the Claude Agent SDK with your Claude plan »
+(mise à jour du 7 octobre 2026). Un appel ordinaire prend 2 à 20 s.
 
 ## Commandes
 
@@ -128,7 +205,25 @@ ni les sessions.
 .venv\Scripts\ruff format .
 ```
 
+Tests réels de l'agent (consomment un peu d'usage, base temporaire vide) :
+
+```powershell
+$env:PILOTAGE_LIVE_AGENT="1"; .venv\Scripts\python manage.py test agent.tests.test_live
+```
+
 Critères d'acceptation de la phase 1 couverts par les tests :
 - `core.tests.test_importer.ImportAcceptanceTests` : 150 lignes → 150 tâches `inbox`/`raw`,
   texte d'origine intact.
 - `core.tests.test_backup.RoundTripTests` : export puis restauration → base identique.
+
+Critères d'acceptation de la phase 2 :
+- tests unitaires : autre utilisateur ignoré (`bot.tests.test_handlers.AuthorizationTests`),
+  `/note` `/capture` `/statut` sans Claude, consigne active après validation, changement de
+  format puis `/annuler` qui restaure la version précédente
+  (`core.tests.test_agent_tools.UndoTests`), ligne de commande sans outil ni contournement
+  (`agent.tests.test_agent.CommandLineTests`) ;
+- tests réels (`agent.tests.test_live`) : lecture de fichier et commande refusées ;
+- scénario réel déroulé le 25/10/2026 sur une base jetable : 2ᵉ oubli de clés → consigne
+  proposée ; après validation, briefing d'un jour « cabinet » avec le rappel des clés ;
+  `/now 1h faible` → 3 options justifiées ; « mets les échéances en premier et raccourcis »
+  → nouvelle spec appliquée au briefing suivant, puis `/annuler` → version précédente active.

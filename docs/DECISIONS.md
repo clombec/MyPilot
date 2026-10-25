@@ -50,10 +50,52 @@ Format : décision, puis raison en une ou deux lignes. Les plus récentes en bas
     recherche dans une liste JSON. Volume faible, sans conséquence.
 17. **Ruff** (règles E, W, F, I, B, UP ; 99 colonnes) pour PEP 8 et l'ordre des imports.
 
-## À trancher en phase 2
+## Phase 2 (2026-10-25)
 
-- Planificateur : `discord.ext.tasks` dans le bot (prévu par la spec) pour le briefing et
-  la relance ; l'export nocturne au même endroit.
-- Session quotidienne Claude Code : `--resume <session_id>` stocké dans `DayLog`, à
-  vérifier avec `claude --help` (version installée : 2.1.310).
-- Service Windows : NSSM ou tâche planifiée au démarrage pour `web` et `bot`.
+18. **Options de Claude Code vérifiées sur la version installée (2.1.310)** par `claude --help`
+    et un essai réel. Retenu : `--tools ""` (coupe tous les outils intégrés, plus sûr qu'une
+    liste d'interdictions qui oublierait un outil), `--permission-mode dontAsk` +
+    `--permission-prompts none`, `--strict-mcp-config`, `--allowedTools mcp__pilotage`,
+    `--setting-sources project` (ni réglages, ni hooks, ni mémoire de l'utilisateur),
+    `--disable-slash-commands`, `--no-chrome`. `--max-turns` n'est plus documenté mais reste
+    accepté. Le message passe par l'entrée standard (pas de limite de longueur de la ligne de
+    commande Windows).
+19. **Dossier de travail de l'agent hors du dépôt** (`~/.pilotage/agent_workspace`) : Claude
+    Code lit les CLAUDE.md des dossiers parents, l'agent aurait sinon reçu les règles de
+    développement. La source versionnée reste `agent_workspace/CLAUDE.md`, copiée au
+    démarrage ; `mcp_config.json` est généré (chemins absolus propres à la machine). Une
+    valeur dans le dépôt est remplacée par le défaut, avec un avertissement.
+20. **Outils de l'agent dans `core/agent_tools.py`**, en Python simple, testables sans Claude ;
+    `agent/mcp_server.py` ne fait que les déclarer. Paquet `mcp` v2 (`MCPServer`, ex-FastMCP) :
+    les outils synchrones tournent dans un thread, donc l'ORM Django s'y utilise normalement.
+21. **Annulation générique** : chaque écriture stocke dans `AuditLog.undo_data` une liste
+    d'opérations (`delete`, `set_fields` avec liens M2M). `/annuler` applique la dernière
+    entrée de l'agent non annulée. Un changement de format annulé passe la nouvelle version
+    en `rejected` : la précédente redevient active, l'historique reste complet.
+22. **Garde-fou minimal contre les secrets dans le code** (motifs « mdp : xxx »,
+    « password=xxx », clés d'API) en plus de la consigne de l'agent. « Noter le mdp dans le
+    carnet » reste permis. Les données patient restent du ressort de l'agent (aucune
+    détection fiable possible par motif).
+23. **Session du jour** : `DayLog.agent_session_id`, reprise par `--resume`. Le briefing
+    ouvre une session neuve qui devient celle du jour. Session introuvable → nouvelle
+    session, avec les 10 derniers échanges des 24 h. Chaque message reçoit un « contexte
+    frais » (heure, journée déclarée, tâches et observations modifiées depuis le dernier
+    échange).
+24. **Planificateur dans le bot** (`discord.ext.tasks`) : briefing, relance, export nocturne
+    (`EXPORT_TIME`, défaut 03:00). Pas de cron : un seul processus à surveiller. Briefing
+    manqué (PC éteint) envoyé au démarrage s'il est avant midi.
+25. **La relance de 10 h n'appelle pas Claude** : texte fixe, coût nul.
+26. **Boutons de validation gérés par `on_interaction`** sur un identifiant
+    `pilotage:proposal:<id>:<accept|reject>` : ils marchent encore après un redémarrage.
+27. **Un seul processus `claude` à la fois** (verrou asyncio dans le backend), une
+    nouvelle tentative au plus sur échec ou délai dépassé ; jamais sur limite d'usage.
+28. **Démarrage automatique par tâches planifiées Windows** (et non un service) : un
+    service tournerait sous un autre compte, non connecté à Claude Code.
+29. **Pages web Propositions et Journal** ajoutées dès la phase 2 : même effet que les
+    boutons Discord et `/annuler`, utile si Discord est indisponible.
+
+## Pour la phase 3
+
+- Revue hebdomadaire plus riche, résumés glissants du journal.
+- Pages web Événements (checklists cochables) et Mémoire (profil, consignes, versions).
+- Mode Mac en lecture seule, `import_json`.

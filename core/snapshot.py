@@ -8,7 +8,7 @@ Lists are cut with plain limits and ordered by date or creation.
 
 from datetime import date, timedelta
 
-from django.db.models import Q
+from django.db.models import F, Q
 
 from .models import DayLog, Event, Observation, Project, Task
 from .services import get_accepted_profile, get_active_rules, task_status_counts, today
@@ -20,6 +20,7 @@ HORIZON_DAYS = 14
 WAITING_DAYS = 5
 TODO_PER_PROJECT = 5
 MAX_LIST = 25
+UNCLEAR_SAMPLE = 10
 
 
 def _fmt_task(task: Task) -> str:
@@ -71,10 +72,11 @@ def build_snapshot(ref_date: date | None = None, scope: str = "full") -> str:
 
     # 1. Days
     day = DayLog.objects.filter(date=ref_date).first()
-    out += ["## Journée", "", _fmt_day(day) if day else "- (pas encore déclarée)", ""]
+    declared = day and (day.declared_focus or day.planned_hours is not None or day.location)
+    out += ["## Journée", "", _fmt_day(day) if declared else "- (pas encore déclarée)", ""]
     recent = DayLog.objects.filter(
         date__lt=ref_date, date__gte=ref_date - timedelta(days=RECENT_DAYS)
-    )
+    ).exclude(declared_focus="", outcome="")
     out += ["## 7 derniers jours", ""]
     out += [_fmt_day(d) for d in recent] or ["- (rien de déclaré)"]
     out.append("")
@@ -150,6 +152,18 @@ def build_snapshot(ref_date: date | None = None, scope: str = "full") -> str:
         "",
         f"- inbox : {counts['inbox']} · brutes (raw) : {raw_count} · todo : {counts['todo']} "
         f"· waiting : {counts['waiting']} · someday : {counts['someday']}",
+        "",
+        f"## Éléments à clarifier (extrait de {UNCLEAR_SAMPLE} : priorité du projet, puis "
+        "ancienneté)",
+        "",
+    ]
+    unclear = (
+        base.filter(clarity__in=[Task.Clarity.RAW, Task.Clarity.PARTIAL])
+        .exclude(status__in=[Task.Status.DONE, Task.Status.DROPPED])
+        .order_by(F("project__priority").asc(nulls_last=True), "created_at", "id")
+    )[:UNCLEAR_SAMPLE]
+    out += [f"{_fmt_task(t)} · {t.clarity}" for t in unclear] or ["- (aucun)"]
+    out += [
         "",
         "## À faire par projet (extrait, ordre échéance puis création)",
         "",

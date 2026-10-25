@@ -1,0 +1,15 @@
+<li id="task-{{ task.pk }}" class="{% if task.status == 'done' %}done{% endif %}">
+  <div class="main">
+    <a href="{% url 'web:task_detail' task.pk %}">{{ task.title }}</a>
+    <div>
+      <span class="badge">#{{ task.pk }}</span>
+      {% if task.project %}<span class="badge">{{ task.project.name }}</span>{% endif %}
+      <span class="badge">{{ task.get_status_display }}</span>
+      {% if task.clarity != 'clear' %}<span class="badge">{{ task.get_clarity_display }}</span>{% endif %}
+      {% if task.due_date %}<span class="badge due">{{ task.due_date|date:"d/m" }}</span>{% endif %}
+    </div>
+  </div>
+  {% if task.status != 'done' %}
+  <button class="secondary" hx-post="{% url 'web:task_done' task.pk %}" hx-target="#task-{{ task.pk }}" hx-swap="outerHTML" title="Marquer comme fait" aria-label="Marquer comme fait">✓</button>
+  {% endif %}
+</li>

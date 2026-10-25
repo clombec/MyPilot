@@ -1,0 +1,9 @@
+<ul class="rows">
+  {% for note in notes %}
+  <li><div class="main">
+    <a href="{% url 'web:note_edit' note.pk %}">{{ note.title }}</a>
+    <div>{% if note.project %}<span class="badge">{{ note.project.name }}</span>{% endif %}{% for tag in note.tags %}<span class="badge">{{ tag }}</span>{% endfor %}</div>
+    <div class="muted">{{ note.text|truncatechars:140 }}</div>
+  </div></li>
+  {% empty %}<li class="muted">Aucune note.</li>{% endfor %}
+</ul>

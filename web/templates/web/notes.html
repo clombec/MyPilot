@@ -1,0 +1,10 @@
+{% extends "web/base.html" %}
+{% block title %}Notes · Pilotage{% endblock %}
+{% block content %}
+<h1>Notes de référence</h1>
+<p><a class="btn" href="{% url 'web:note_create' %}">+ Nouvelle note</a></p>
+<form class="inline" method="get" hx-get="{% url 'web:note_list' %}" hx-target="#note-results" hx-trigger="keyup changed delay:400ms from:find input[type=search], submit" style="margin-bottom:12px">
+  <input type="search" name="q" value="{{ q }}" placeholder="Rechercher dans les notes…">
+</form>
+<div id="note-results" class="card">{% include "web/partials/note_rows.html" %}</div>
+{% endblock %}

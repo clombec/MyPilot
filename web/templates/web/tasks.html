@@ -1,0 +1,36 @@
+{% extends "web/base.html" %}
+{% block title %}Tâches · Pilotage{% endblock %}
+{% block content %}
+<h1>Tâches</h1>
+<div class="card">
+  <form class="inline" method="post" action="{% url 'web:capture' %}">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <input type="text" name="text" placeholder="Capturer une tâche…" required>
+    <button type="submit">Capturer</button>
+  </form>
+</div>
+<form class="filters" method="get" hx-get="{% url 'web:task_list' %}" hx-target="#task-results" hx-trigger="change, keyup changed delay:400ms from:find input[type=search]" hx-push-url="true">
+  <input type="search" name="q" value="{{ filters.q }}" placeholder="Rechercher…">
+  <select name="project" aria-label="Projet">
+    <option value="">Tous les projets</option>
+    <option value="none" {% if filters.project == 'none' %}selected{% endif %}>Sans projet</option>
+    {% for p in projects %}<option value="{{ p.slug }}" {% if filters.project == p.slug %}selected{% endif %}>{{ p.name }}</option>{% endfor %}
+  </select>
+  <select name="status" aria-label="Statut">
+    <option value="open" {% if filters.status == 'open' %}selected{% endif %}>Ouvertes</option>
+    <option value="all" {% if filters.status == 'all' %}selected{% endif %}>Tous statuts</option>
+    {% for value, label in statuses %}<option value="{{ value }}" {% if filters.status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+  </select>
+  <select name="clarity" aria-label="Clarté">
+    <option value="">Toute clarté</option>
+    {% for value, label in clarities %}<option value="{{ value }}" {% if filters.clarity == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+  </select>
+  <select name="order" aria-label="Tri">
+    <option value="created" {% if filters.order == 'created' %}selected{% endif %}>Par création</option>
+    <option value="due" {% if filters.order == 'due' %}selected{% endif %}>Par échéance</option>
+  </select>
+  <noscript><button type="submit">Filtrer</button></noscript>
+</form>
+<div id="task-results">{% include "web/partials/task_rows.html" %}</div>
+{% endblock %}

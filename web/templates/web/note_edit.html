@@ -1,0 +1,11 @@
+{% extends "web/base.html" %}
+{% block title %}Note · Pilotage{% endblock %}
+{% block content %}
+<p><a href="{% url 'web:note_list' %}">← Notes</a></p>
+<h1>{% if note %}{{ note.title }}{% else %}Nouvelle note{% endif %}</h1>
+<form method="post" class="card form-grid">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Enregistrer</button>
+</form>
+{% endblock %}

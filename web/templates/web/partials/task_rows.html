@@ -1,0 +1,4 @@
+<p class="muted">{{ total }} tâche{{ total|pluralize }}{% if truncated %} (affichage limité){% endif %}</p>
+<ul class="rows">
+  {% for task in tasks %}{% include "web/partials/task_row.html" %}{% empty %}<li class="muted">Aucune tâche.</li>{% endfor %}
+</ul>

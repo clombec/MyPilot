@@ -1,0 +1,10 @@
+[tool.ruff]
+line-length = 99
+target-version = "py312"
+extend-exclude = ["*/migrations/0001_*.py"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "UP"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["core", "api", "web", "config"]

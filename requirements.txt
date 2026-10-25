@@ -1,0 +1,5 @@
+Django==5.2.18
+django-ninja==1.7.1
+python-dotenv==1.2.4
+waitress==3.0.2
+whitenoise==6.12.0

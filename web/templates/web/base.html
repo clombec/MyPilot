@@ -1,0 +1,29 @@
+{% load static %}<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Pilotage{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'web/style.css' %}">
+  <script src="{% static 'web/htmx.min.js' %}" defer></script>
+</head>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+{% if user.is_authenticated %}
+<header class="top">
+  <nav class="tabs">
+    <a href="{% url 'web:home' %}" class="{% if active_tab == 'home' %}active{% endif %}">Accueil</a>
+    <a href="{% url 'web:task_list' %}" class="{% if active_tab == 'tasks' %}active{% endif %}">Tâches</a>
+    <a href="{% url 'web:note_list' %}" class="{% if active_tab == 'notes' %}active{% endif %}">Notes</a>
+  </nav>
+</header>
+{% endif %}
+<main>
+  {% if messages %}
+  <ul class="messages">
+    {% for message in messages %}<li class="{{ message.tags }}">{{ message }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>

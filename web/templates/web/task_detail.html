@@ -1,0 +1,27 @@
+{% extends "web/base.html" %}
+{% block title %}#{{ task.pk }} · Pilotage{% endblock %}
+{% block content %}
+<p><a href="{% url 'web:task_list' %}">← Tâches</a></p>
+<h1>#{{ task.pk }} {{ task.title }}</h1>
+{% if task.raw_text %}
+<div class="card">
+  <div class="muted">Texte d'origine (jamais modifié)</div>
+  <div class="raw">{{ task.raw_text }}</div>
+</div>
+{% endif %}
+{% if task.status != 'done' %}
+<form method="post" action="{% url 'web:task_done' task.pk %}" style="margin-bottom:12px">
+  {% csrf_token %}<button type="submit">✓ Marquer comme fait</button>
+</form>
+{% endif %}
+<form method="post" class="card form-grid">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Enregistrer</button>
+</form>
+{% if subtasks %}
+<h2>Sous-tâches</h2>
+<div class="card"><ul class="rows">{% for task in subtasks %}{% include "web/partials/task_row.html" %}{% endfor %}</ul></div>
+{% endif %}
+<p class="muted">Créée le {{ task.created_at|date:"d/m/Y H:i" }} ({{ task.get_created_by_display }}) · modifiée le {{ task.updated_at|date:"d/m/Y H:i" }}{% if task.done_at %} · faite le {{ task.done_at|date:"d/m/Y H:i" }}{% endif %}</p>
+{% endblock %}

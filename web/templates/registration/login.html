@@ -1,0 +1,12 @@
+{% extends "web/base.html" %}
+{% block title %}Connexion · Pilotage{% endblock %}
+{% block content %}
+<h1>Pilotage</h1>
+<form method="post" class="card form-grid">
+  {% csrf_token %}
+  {% if form.errors %}<p class="muted">Identifiant ou mot de passe incorrect.</p>{% endif %}
+  {{ form.as_p }}
+  <input type="hidden" name="next" value="{{ next }}">
+  <button type="submit">Se connecter</button>
+</form>
+{% endblock %}

@@ -1,0 +1,30 @@
+# Secrets and local configuration
+.env
+local_settings.py
+configuration.yaml
+
+# Live data: database, exports, safety backups (never versioned)
+data/
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
+
+# Logs
+logs/
+*.log
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.ruff_cache/
+
+# Django
+staticfiles/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+~$*.xlsx

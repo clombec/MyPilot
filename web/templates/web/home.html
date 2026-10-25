@@ -1,0 +1,54 @@
+{% extends "web/base.html" %}
+{% block content %}
+<h1>Accueil</h1>
+
+<div class="card">
+  <form class="inline" method="post" action="{% url 'web:capture' %}">
+    {% csrf_token %}
+    <input type="text" name="text" placeholder="Capturer une tâche…" required>
+    <button type="submit">Capturer</button>
+  </form>
+</div>
+<div class="card">
+  <form class="inline" method="post" action="{% url 'web:quick_note' %}">
+    {% csrf_token %}
+    <input type="text" name="text" placeholder="Observation (ex. oublié mes clés)" required>
+    <button type="submit" class="secondary">Noter</button>
+  </form>
+</div>
+
+<h2>Dernier briefing</h2>
+<div class="card">
+  {% if briefing %}
+  <div class="muted">{{ briefing.date|date:"l j F" }}</div>
+  <div class="briefing">{{ briefing.content }}</div>
+  {% else %}
+  <div class="muted">Pas encore de briefing.</div>
+  {% endif %}
+</div>
+
+<h2>Échéances proches</h2>
+<div class="card">
+  {% if due_tasks %}
+  <ul class="rows">
+    {% for task in due_tasks %}{% include "web/partials/task_row.html" %}{% endfor %}
+  </ul>
+  {% else %}
+  <div class="muted">Aucune échéance dans les 14 jours.</div>
+  {% endif %}
+</div>
+
+<h2>Compteurs</h2>
+<div class="counts">
+  <span class="badge">inbox {{ counts.inbox }}</span>
+  <span class="badge">à faire {{ counts.todo }}</span>
+  <span class="badge">en cours {{ counts.doing }}</span>
+  <span class="badge">en attente {{ counts.waiting }}</span>
+  <span class="badge">un jour {{ counts.someday }}</span>
+  <span class="badge">fait {{ counts.done }}</span>
+</div>
+
+<form method="post" action="{% url 'web:logout' %}" style="margin-top:24px">
+  {% csrf_token %}<button type="submit" class="linklike">Se déconnecter</button>
+</form>
+{% endblock %}

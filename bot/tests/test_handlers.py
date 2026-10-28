@@ -94,8 +94,8 @@ class DeterministicCommandTests(TestCase):
         self.assertEqual(Task.objects.count(), 0)
 
     def test_declare_day(self) -> None:
-        reply = handlers.declare_day("DrAB, cabinet", 6, "low")
-        self.assertIn("énergie faible", reply)
+        reply = handlers.declare_day("DrAB, cabinet", 6)
+        self.assertIn("6 h", reply)
 
 
 class ProposalFlowTests(TestCase):

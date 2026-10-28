@@ -30,7 +30,6 @@ from .models import (
     Author,
     BriefingSpecVersion,
     DayLog,
-    Energy,
     Event,
     Note,
     Observation,
@@ -53,7 +52,6 @@ TASK_EDITABLE_FIELDS = {
     "status",
     "notes",
     "est_minutes",
-    "energy",
     "context",
     "due_date",
     "not_before",
@@ -172,8 +170,6 @@ def _task_line(task: Task) -> str:
         bits.append(f"échéance {task.due_date.isoformat()}")
     if task.est_minutes:
         bits.append(f"{task.est_minutes} min")
-    if task.energy:
-        bits.append(f"énergie {task.energy}")
     if task.context:
         bits.append(f"ctx {task.context}")
     if task.waiting_for:
@@ -327,7 +323,6 @@ def get_day(day: str | None = None) -> str:
         f"{target.isoformat()}",
         f"focus : {log.declared_focus or '?'}",
         f"heures : {log.planned_hours if log.planned_hours is not None else '?'}",
-        f"énergie : {log.energy or '?'}",
         f"lieu : {log.location or '?'}",
     ]
     if log.notes:
@@ -388,7 +383,6 @@ def create_task(
     clarity: str = Task.Clarity.RAW,
     notes: str = "",
     est_minutes: int | None = None,
-    energy: str | None = None,
     context: str | None = None,
     due_date: str | None = None,
     not_before: str | None = None,
@@ -412,7 +406,6 @@ def create_task(
         clarity=_choice(clarity, Task.Clarity, "clarity", allow_none=False),
         notes=notes or "",
         est_minutes=est_minutes,
-        energy=_choice(energy, Energy, "energy"),
         context=context or None,
         due_date=_parse_date(due_date, "due_date"),
         not_before=_parse_date(not_before, "not_before"),
@@ -470,8 +463,6 @@ def update_task(task_id: int, fields: dict[str, Any]) -> tuple[str, dict]:
             task.status = _choice(value, Task.Status, "status", allow_none=False)
         elif key == "clarity":
             task.clarity = _choice(value, Task.Clarity, "clarity", allow_none=False)
-        elif key == "energy":
-            task.energy = _choice(value, Energy, "energy")
         elif key == "parent_id":
             task.parent = _valid_parent(value, task)
         elif key == "title":
@@ -646,7 +637,6 @@ def set_day(
     day: str | None = None,
     focus: str | None = None,
     hours: float | None = None,
-    energy: str | None = None,
     location: str | None = None,
     notes: str | None = None,
 ) -> tuple[str, dict]:
@@ -654,7 +644,7 @@ def set_day(
     target = _parse_date(day, "date") or services.today()
     _check_secrets(focus, notes)
     log, created = DayLog.objects.get_or_create(date=target)
-    names = ["declared_focus", "planned_hours", "energy", "location", "notes"]
+    names = ["declared_focus", "planned_hours", "location", "notes"]
     before = _snapshot_fields(log, names)
     if focus is not None:
         log.declared_focus = focus[:300]
@@ -662,8 +652,6 @@ def set_day(
         if not 0 <= float(hours) <= 24:
             raise ToolError("hours: between 0 and 24")
         log.planned_hours = round(float(hours), 1)
-    if energy is not None:
-        log.energy = _choice(energy, Energy, "energy")
     if location is not None:
         log.location = location[:100]
     if notes is not None:

@@ -29,11 +29,6 @@ logger = logging.getLogger(__name__)
 
 CUSTOM_ID_PREFIX = "pilotage"
 CATCH_UP_UNTIL_HOUR = 12
-ENERGY_CHOICES = [
-    app_commands.Choice(name="faible", value="low"),
-    app_commands.Choice(name="moyenne", value="medium"),
-    app_commands.Choice(name="haute", value="high"),
-]
 
 
 def _error_text(exc: AgentError) -> str:
@@ -306,17 +301,15 @@ def register_commands(bot: PilotBot) -> None:
         await interaction.response.send_message(await sync_to_async(handlers.undo)())
 
     @tree.command(name="now", description="J'ai du temps : propose 2 ou 3 options")
-    @app_commands.describe(duree="Ex. 1h, 30 min", energie="Ton énergie", contexte="Lieu, outil…")
-    @app_commands.choices(energie=ENERGY_CHOICES)
+    @app_commands.describe(duree="Ex. 1h, 30 min", contexte="Lieu, outil…")
     async def now_cmd(
         interaction: discord.Interaction,
         duree: str,
-        energie: app_commands.Choice[str],
         contexte: str | None = None,
     ) -> None:
         ctx = f", contexte : {contexte}" if contexte else ""
         prompt = (
-            f"/now : j'ai {duree} devant moi, énergie {energie.name}{ctx}. "
+            f"/now : j'ai {duree} devant moi{ctx}. "
             "Propose 2 ou 3 options, chacune avec une phrase qui explique pourquoi."
         )
         await bot.answer_interaction(
@@ -325,16 +318,12 @@ def register_commands(bot: PilotBot) -> None:
 
     @tree.command(name="jour", description="Déclare ta journée, l'agent propose un plan")
     @app_commands.describe(focus="Projet(s) du jour, lieu…", heures="Heures dispo")
-    @app_commands.choices(energie=ENERGY_CHOICES)
     async def day_cmd(
         interaction: discord.Interaction,
         focus: str,
         heures: float | None = None,
-        energie: app_commands.Choice[str] | None = None,
     ) -> None:
-        recorded = await sync_to_async(handlers.declare_day)(
-            focus, heures, energie.value if energie else None
-        )
+        recorded = await sync_to_async(handlers.declare_day)(focus, heures)
         prompt = (
             f"/jour : {recorded}. Rappelle les consignes qui s'appliquent aujourd'hui, puis "
             "propose un plan du jour en options (pas un ordre)."

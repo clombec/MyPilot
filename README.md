@@ -134,8 +134,8 @@ briefing, il est envoyé au démarrage du bot (avant midi).
 | `/annuler` | non | annule la dernière écriture de l'agent |
 | `/fait <n°>` | non | clôt la tâche n° (avec du texte : l'agent retrouve la tâche) |
 | `/briefing-format` | non | spec actuelle + 5 versions, menu pour revenir en arrière |
-| `/now <durée> <énergie> [contexte]` | oui | 2 ou 3 options justifiées |
-| `/jour <focus> [heures] [énergie]` | oui | enregistre la journée, l'agent propose un plan |
+| `/now <durée> [contexte]` | oui | 2 ou 3 options justifiées |
+| `/jour <focus> [heures]` | oui | enregistre la journée, l'agent propose un plan |
 | `/clarifie [n]` | oui | l'agent prend n éléments bruts et pose ses questions |
 | `/semaine` | oui | revue de la semaine |
 | `/briefing` | oui | regénère le briefing dans `#briefing` |

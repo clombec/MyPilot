@@ -84,7 +84,6 @@ def build_fresh_context(since: datetime | None) -> str:
         lines.append(
             f"Journée déclarée : {day.declared_focus}"
             + (f", {day.planned_hours} h" if day.planned_hours is not None else "")
-            + (f", énergie {day.energy}" if day.energy else "")
             + (f", lieu {day.location}" if day.location else "")
         )
     else:

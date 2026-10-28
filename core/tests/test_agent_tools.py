@@ -75,10 +75,12 @@ class WriteToolTests(TestCase):
         task = Task.objects.create(title="a", raw_text="original")
         with self.assertRaises(ToolError):
             tools.update_task(task.pk, {"raw_text": "hack"})
-        tools.update_task(task.pk, {"title": "Titre clair", "clarity": "clear", "energy": "low"})
+        tools.update_task(task.pk, {"title": "Titre clair", "clarity": "clear", "est_minutes": 20})
         task.refresh_from_db()
         self.assertEqual(task.raw_text, "original")
-        self.assertEqual((task.title, task.clarity, task.energy), ("Titre clair", "clear", "low"))
+        self.assertEqual(
+            (task.title, task.clarity, task.est_minutes), ("Titre clair", "clear", 20)
+        )
 
     def test_drop_needs_a_proposal(self) -> None:
         task = Task.objects.create(title="a")
@@ -132,7 +134,7 @@ class WriteToolTests(TestCase):
             tools.create_event("x", "2026-11-05", end_date="2026-11-01")
 
     def test_set_day_partial_update(self) -> None:
-        tools.set_day("2026-10-26", focus="DrAB cabinet", hours=6, energy="medium")
+        tools.set_day("2026-10-26", focus="DrAB cabinet", hours=6)
         tools.set_day("2026-10-26", location="cabinet")
         log = DayLog.objects.get(date=date(2026, 10, 26))
         self.assertEqual((log.declared_focus, log.location), ("DrAB cabinet", "cabinet"))

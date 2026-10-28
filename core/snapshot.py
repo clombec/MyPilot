@@ -32,8 +32,6 @@ def _fmt_task(task: Task) -> str:
         parts.append(f"échéance {task.due_date:%d/%m}")
     if task.est_minutes:
         parts.append(f"{task.est_minutes} min")
-    if task.energy:
-        parts.append(f"énergie {task.energy}")
     if task.waiting_for:
         parts.append(f"attend {task.waiting_for}")
     return "- " + " · ".join(parts)
@@ -46,8 +44,6 @@ def _fmt_day(day: DayLog) -> str:
         bits.append(f"focus {day.declared_focus}")
     if day.planned_hours is not None:
         bits.append(f"{day.planned_hours} h")
-    if day.energy:
-        bits.append(f"énergie {day.energy}")
     if day.location:
         bits.append(f"lieu {day.location}")
     if day.outcome:

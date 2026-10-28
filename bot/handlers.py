@@ -23,7 +23,6 @@ from core.models import (
     BriefingSpecVersion,
     ConversationTurn,
     DayLog,
-    Energy,
     Project,
     Proposal,
     ReviewStatus,
@@ -38,7 +37,6 @@ logger = logging.getLogger(__name__)
 PROPOSAL_PREVIEW = 1400
 SPEC_HISTORY = 5
 CAPTURE_PREFIX_RE = re.compile(r"^\s*#?([a-z][a-z0-9-]{1,30})\s*:\s*(.+)$", re.IGNORECASE | re.S)
-ENERGY_LABELS = {"low": "faible", "medium": "moyenne", "high": "haute"}
 
 
 def is_authorized(config: BotConfig, user_id: int, channel_id: int | None) -> bool:
@@ -151,20 +149,16 @@ def undo() -> str:
     return f"↩️ Annulé : {entry.result} (outil {entry.tool}, {when:%d/%m %H:%M})."
 
 
-def declare_day(focus: str, hours: float | None = None, energy: str | None = None) -> str:
+def declare_day(focus: str, hours: float | None = None) -> str:
     """`/jour`: record the declared day (the agent then proposes a plan)."""
     log, _ = DayLog.objects.get_or_create(date=services.today())
     log.declared_focus = focus.strip()[:300]
     if hours is not None:
         log.planned_hours = round(hours, 1)
-    if energy in Energy.values:
-        log.energy = energy
     log.save()
     bits = [log.declared_focus]
     if log.planned_hours is not None:
         bits.append(f"{log.planned_hours} h")
-    if log.energy:
-        bits.append(f"énergie {ENERGY_LABELS[log.energy]}")
     return "Journée enregistrée : " + ", ".join(bits)
 
 
@@ -196,7 +190,7 @@ def should_nudge() -> bool:
 
 
 NUDGE_TEXT = (
-    "👋 Petit rappel : qu'est-ce que tu fais aujourd'hui, combien de temps, quelle énergie ? "
+    "👋 Petit rappel : qu'est-ce que tu fais aujourd'hui, combien de temps ? "
     "Réponds ici quand tu veux (ou `/jour`)."
 )
 

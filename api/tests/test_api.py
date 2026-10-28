@@ -119,10 +119,10 @@ class OtherApiTests(TestCase):
     def test_day_upsert(self) -> None:
         url = "/api/days/2026-10-25"
         self.client.put(url, {"declared_focus": "DrAB"}, content_type="application/json", **AUTH)
-        self.client.put(url, {"energy": "low"}, content_type="application/json", **AUTH)
+        self.client.put(url, {"location": "cabinet"}, content_type="application/json", **AUTH)
         data = self.client.get(url, **AUTH).json()
         self.assertEqual(data["declared_focus"], "DrAB")
-        self.assertEqual(data["energy"], "low")
+        self.assertEqual(data["location"], "cabinet")
 
     def test_snapshot_and_projects(self) -> None:
         self.assertIn("# Situation", self.client.get("/api/snapshot", **AUTH).json()["markdown"])

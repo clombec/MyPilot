@@ -47,15 +47,15 @@ DESCRIPTIONS = {
     ),
     "update_task": (
         "Update fields of a task. fields is an object with any of: title, project (slug), "
-        "status (inbox|todo|doing|waiting|someday|done), notes, est_minutes, energy "
-        "(low|medium|high), context, due_date, not_before, waiting_for, waiting_since "
+        "status (inbox|todo|doing|waiting|someday|done), notes, est_minutes, context, "
+        "due_date, not_before, waiting_for, waiting_since "
         "(YYYY-MM-DD), parent_id (top-level task only), linked_project (slug), clarity "
         "(raw|partial|clear), recurrence. raw_text can never change. To drop a task, use "
         "propose_task_drop."
     ),
     "create_task": (
-        "Create a task (only title is required). Dates YYYY-MM-DD, energy low|medium|high, "
-        "project slug. Never invent a date or a task the user did not give."
+        "Create a task (only title is required). Dates YYYY-MM-DD, project slug. "
+        " Never invent a date or a task the user did not give."
     ),
     "split_task": "Turn a top-level task into a 'chantier' with the given subtask titles.",
     "create_event": (
@@ -69,7 +69,7 @@ DESCRIPTIONS = {
     ),
     "set_day": (
         "Record what the user declared for a day (default today): focus (projects, free "
-        "text), hours, energy (low|medium|high), location (cabinet/maison/autre), notes. "
+        "text), hours, location (cabinet/maison/autre), notes. "
         "Omitted fields stay unchanged."
     ),
     "update_briefing_spec": (

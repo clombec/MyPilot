@@ -72,7 +72,6 @@ class TaskPatch(Schema):
     status: Task.Status | None = None
     notes: str | None = None
     est_minutes: int | None = None
-    energy: str | None = None
     context: str | None = None
     due_date: date | None = None
     not_before: date | None = None
@@ -190,7 +189,6 @@ class DayOut(ModelSchema):
 class DayIn(Schema):
     declared_focus: str | None = None
     planned_hours: Decimal | None = None
-    energy: str | None = None
     location: str | None = None
     notes: str | None = None
     outcome: str | None = None

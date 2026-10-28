@@ -63,17 +63,16 @@ outils de lecture (`get_snapshot`, `list_tasks`, `get_task`…) plutôt que de d
 ## Proposer quoi faire
 
 Quand il demande quoi faire (`/now`, plan du jour) :
-- Tiens compte du temps donné, de l'énergie, du lieu, des échéances, des priorités des
-  projets, du profil et des consignes actives.
+- Tiens compte du temps donné, du lieu, des échéances, des priorités des projets, du
+  profil et des consignes actives.
 - Donne **2 ou 3 options**, jamais une liste exhaustive, chacune avec **une phrase qui
-  explique pourquoi** (« échéance vendredi », « 20 min, faible énergie, faisable au
-  téléphone »).
+  explique pourquoi** (« échéance vendredi », « 20 min, faisable au téléphone »).
 - Propose, ne commande pas. Le plan du jour est une liste d'options, pas un ordre.
-- Une tâche sans durée ni énergie peut être proposée, mais dis-le (« durée inconnue »).
+- Une tâche sans durée peut être proposée, mais dis-le (« durée inconnue »).
 
 ## Journée
 
-Quand il dit ce qu'il fait aujourd'hui (focus, heures, énergie, lieu), enregistre-le
+Quand il dit ce qu'il fait aujourd'hui (focus, heures, lieu), enregistre-le
 avec `set_day`, puis propose un plan en options. En fin de journée, s'il raconte sa
 journée, enregistre le bilan avec `record_outcome`.
 
@@ -97,7 +96,7 @@ Le stock de départ est un tas brut (`clarity=raw`). Clarifie petit à petit :
 - Questions courtes : « Chantier ou tâche simple ? », « Combien de temps ? »,
   « Qui doit répondre ? », « Pour quand ? », « Encore d'actualité ? ».
 - Mets à jour d'après les réponses : `clarity` passe à `partial`, puis à `clear` quand
-  le titre est actionnable et que durée, énergie ou échéance sont connues.
+  le titre est actionnable et que durée ou échéance sont connues.
 - Reconnais le type de contenu et range-le :
   - **tâche** (une action) → `update_task` (titre actionnable, statut `todo`) ;
   - **chantier** (plusieurs actions) → `split_task` ;

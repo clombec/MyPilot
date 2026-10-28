@@ -14,14 +14,6 @@ all planning is done by the agent (see CLAUDE_pilotage.md §2).
 from django.db import models
 
 
-class Energy(models.TextChoices):
-    """Energy level, used for tasks, days and work sessions."""
-
-    LOW = "low", "faible"
-    MEDIUM = "medium", "moyenne"
-    HIGH = "high", "haute"
-
-
 class Author(models.TextChoices):
     """Who created a record."""
 
@@ -97,7 +89,6 @@ class Task(models.Model):
     raw_text = models.TextField(blank=True, help_text="Original text, never modified")
     notes = models.TextField(blank=True)
     est_minutes = models.PositiveIntegerField(null=True, blank=True)
-    energy = models.CharField(max_length=6, choices=Energy.choices, null=True, blank=True)
     context = models.CharField(max_length=50, null=True, blank=True)
     due_date = models.DateField(null=True, blank=True)
     not_before = models.DateField(null=True, blank=True)
@@ -172,7 +163,6 @@ class DayLog(models.Model):
     date = models.DateField(unique=True)
     declared_focus = models.CharField(max_length=300, blank=True)
     planned_hours = models.DecimalField(max_digits=4, decimal_places=1, null=True, blank=True)
-    energy = models.CharField(max_length=6, choices=Energy.choices, null=True, blank=True)
     location = models.CharField(max_length=100, blank=True)
     notes = models.TextField(blank=True)
     outcome = models.TextField(blank=True)
@@ -200,9 +190,6 @@ class WorkSession(models.Model):
     )
     start = models.DateTimeField()
     end = models.DateTimeField(null=True, blank=True)
-    perceived_energy = models.CharField(
-        max_length=6, choices=Energy.choices, null=True, blank=True
-    )
     notes = models.TextField(blank=True)
 
     class Meta:

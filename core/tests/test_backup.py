@@ -54,7 +54,7 @@ def populate() -> None:
         checklist=[{"label": "hôtel", "done": False}, {"label": "train", "done": True}],
     )
     event.tasks.set([tasks[2], late])
-    DayLog.objects.create(date=date(2026, 10, 24), declared_focus="DrAB", energy="low")
+    DayLog.objects.create(date=date(2026, 10, 24), declared_focus="DrAB")
     Note.objects.create(title="Règle facturation", text="…", tags=["mnemos"], project=drab)
     obs = services.add_observation("oublié mes clés", ["clés"])
     rule = Rule.objects.create(

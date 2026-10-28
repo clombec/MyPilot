@@ -16,7 +16,7 @@ L'utilisateur gère 5 activités en parallèle :
 
 Ses jours de travail changent d'une semaine à l'autre. Il travaille aussi le samedi.
 
-**Besoin** : un assistant qui le connaît, lui fait un point chaque matin, lui demande ce qu'il fait, lui rappelle les choses importantes (ex. ne pas oublier ses clés les jours cabinet), propose quoi faire selon le temps disponible, son énergie et les urgences, et **clarifie petit à petit** une masse de tâches brutes.
+**Besoin** : un assistant qui le connaît, lui fait un point chaque matin, lui demande ce qu'il fait, lui rappelle les choses importantes (ex. ne pas oublier ses clés les jours cabinet), propose quoi faire selon le temps disponible et les urgences, et **clarifie petit à petit** une masse de tâches brutes.
 
 ## 2. Principe directeur (à ne jamais enfreindre)
 
@@ -73,7 +73,7 @@ Principe : **peu de champs obligatoires**. Une tâche existe avec un simple titr
   - `title` (obligatoire), `project` (nullable : une tâche brute n'a pas encore de projet),
   - `status` : `inbox` (par défaut), `todo`, `doing`, `waiting` (en attente de quelqu'un), `someday`, `done`, `dropped`,
   - `raw_text` (le texte d'origine, jamais modifié), `notes`,
-  - `est_minutes` (nullable), `energy` (`low`/`medium`/`high`, nullable), `context` (nullable, texte court : `pc`, `cabinet`, `téléphone`, `achat`, `déplacement`…),
+  - `est_minutes` (nullable), `context` (nullable, texte court : `pc`, `cabinet`, `téléphone`, `achat`, `déplacement`…),
   - `due_date` (nullable), `not_before` (nullable), `waiting_for` (texte, nullable), `waiting_since` (nullable),
   - `parent` (FK vers Task, un seul niveau : le parent est un « chantier »),
   - `linked_project` (nullable) : pour une tâche DrAB réalisée dans CaBO, par exemple,
@@ -81,8 +81,8 @@ Principe : **peu de champs obligatoires**. Une tâche existe avec un simple titr
   - `recurrence` (texte libre ou rrule, nullable),
   - `created_at`, `updated_at`, `done_at`, `created_by` (`user`/`agent`/`import`).
 - **Event** : `title`, `project`, `start_date`, `end_date`, `location`, `notes`, `status` (`planned`, `confirmed`, `done`, `cancelled`), `checklist` (JSON : liste d'éléments libres comme hôtel, train, blocage agenda, confirmation d'inscription). Un événement peut être lié à des tâches.
-- **DayLog** : `date` (unique), `declared_focus` (projet(s) du jour, texte libre), `planned_hours` (nullable), `energy` (nullable), `location` (cabinet / maison / autre), `notes`, `outcome` (texte, rempli en fin de journée). Les jours changeant chaque semaine, rien n'est présupposé : l'agent demande chaque matin.
-- **WorkSession** (optionnel en phase 1) : `task` (nullable), `project`, `start`, `end`, `perceived_energy`, `notes`.
+- **DayLog** : `date` (unique), `declared_focus` (projet(s) du jour, texte libre), `planned_hours` (nullable), `location` (cabinet / maison / autre), `notes`, `outcome` (texte, rempli en fin de journée). Les jours changeant chaque semaine, rien n'est présupposé : l'agent demande chaque matin.
+- **WorkSession** (optionnel en phase 1) : `task` (nullable), `project`, `start`, `end`, `notes`.
 
 ### Couche 2 : mémoire souple
 
@@ -111,7 +111,7 @@ L'agent n'a accès qu'à ces fonctions, exposées par un **serveur MCP local** (
 **Écriture libre** (sans validation)
 - `create_task(title, project?, ...)`, `update_task(id, fields)`, `complete_task(id)`, `split_task(id, subtasks)`.
 - `create_event`, `update_event`.
-- `set_day(date, focus, hours, energy, location, notes)`.
+- `set_day(date, focus, hours, location, notes)`.
 - `add_observation(text, tags)`.
 - `record_outcome(date, text)`.
 
@@ -214,7 +214,7 @@ Le bot **ignore tout utilisateur autre que l'ID autorisé** (`DISCORD_OWNER_ID`)
   1. une phrase de situation (jour, ce qui est prévu s'il y en a),
   2. **rappels du jour** (consignes applicables, ex. clés),
   3. échéances et événements des 7 prochains jours,
-  4. une question : « qu'est-ce que tu fais aujourd'hui, combien de temps, quelle énergie ? »,
+  4. une question : « qu'est-ce que tu fais aujourd'hui, combien de temps ? »,
   5. 2 ou 3 éléments à clarifier dans la boîte de réception.
   Maximum 1 200 caractères.
 - **Sections numérotées** dans le message pour que l'utilisateur puisse réagir précisément (« supprime la 3 », « la 5 est inutile »).
@@ -226,8 +226,8 @@ Le bot **ignore tout utilisateur autre que l'ID autorisé** (`DISCORD_OWNER_ID`)
 ### Commandes slash
 - `/note <texte>` : ajoute une observation (ex. `/note oublié mes clés`).
 - `/capture <texte> [projet]` : tâche brute.
-- `/now <durée> <énergie> [contexte]` : l'agent propose 2 ou 3 options pour le temps donné (ex. `/now 1h faible`).
-- `/jour <focus> [heures] [énergie]` : déclare la journée.
+- `/now <durée> [contexte]` : l'agent propose 2 ou 3 options pour le temps donné (ex. `/now 1h`).
+- `/jour <focus> [heures]` : déclare la journée.
 - `/fait <id ou texte>` : clôt une tâche (l'agent retrouve la bonne).
 - `/clarifie [n]` : l'agent prend `n` éléments bruts et pose ses questions.
 - `/semaine` : revue de la semaine.
@@ -309,7 +309,7 @@ Fournir un `.env.example` sans valeurs. `.env` dans `.gitignore`.
 Doit contenir :
 - Le rôle : assistant de pilotage personnel et de gestion d'une personne qui jongle avec 5 projets (voir §1). Ton direct, chaleureux, sans jargon, jamais moralisateur, tutoiement.
 - Les règles du §5 et du §12.
-- Comment choisir quoi proposer : prendre en compte le temps donné, l'énergie, le lieu, les échéances, les priorités de projets, le profil, les consignes, et **expliquer en une phrase pourquoi**. Donner 2 ou 3 options, jamais une liste exhaustive.
+- Comment choisir quoi proposer : prendre en compte le temps donné, le lieu, les échéances, les priorités de projets, le profil, les consignes, et **expliquer en une phrase pourquoi**. Donner 2 ou 3 options, jamais une liste exhaustive.
 - Comment détecter une récurrence dans les observations et la proposer en consigne (à partir de deux occurrences).
 - Comment mener la clarification (§6).
 - Format de sortie : court, lisible sur téléphone, listes courtes.

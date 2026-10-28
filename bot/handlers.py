@@ -53,6 +53,30 @@ def is_authorized(config: BotConfig, user_id: int, channel_id: int | None) -> bo
     return user_id == config.owner_id and channel_id in config.channels
 
 
+def is_trusted_webhook(config: BotConfig, webhook_id: int | None, channel_id: int | None) -> bool:
+    """Only the allowed webhooks, only in #agent.
+
+    Args:
+        config: Bot configuration.
+        webhook_id: Discord id of the webhook that posted, or None (not a webhook).
+        channel_id: Discord id of the channel, or None (DM).
+
+    Returns:
+        True if the webhook message should be sent to the agent.
+    """
+    return (
+        webhook_id is not None
+        and webhook_id in config.agent_webhook_ids
+        and channel_id == config.channel_agent
+    )
+
+
+def webhook_prompt(author_name: str, content: str) -> str:
+    """Wrap a webhook message so the agent knows it does not come from the user."""
+    header = f"[Message reçu via le webhook « {author_name} », pas écrit par l'utilisateur]"
+    return f"{header}\n{content}"
+
+
 # --- Commands without Claude ------------------------------------------------
 
 

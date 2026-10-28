@@ -148,7 +148,28 @@ class PilotBot(commands.Bot):
         return first  # type: ignore[return-value]
 
     async def on_message(self, message: discord.Message) -> None:
-        """#capture → raw task; #agent and #briefing → agent. Everything else ignored."""
+        """#capture → raw task; #agent and #briefing → agent. Everything else ignored.
+
+        Messages from an allowed webhook in #agent also go to the agent.
+        """
+        if handlers.is_trusted_webhook(self.config, message.webhook_id, message.channel.id):
+            content = message.content.strip()
+            if not content:
+                logger.info("Ignored webhook %s: message has no text", message.webhook_id)
+                return
+            logger.info("Webhook message received from %s", message.webhook_id)
+            prompt = handlers.webhook_prompt(message.author.display_name, content)
+            await self.ask_agent(message.channel, lambda: self.agent.chat(prompt, channel="agent"))
+            return
+        if message.webhook_id is not None:
+            logger.info(
+                "Ignored webhook %s in channel %s (allowed: %s in channel %s)",
+                message.webhook_id,
+                message.channel.id,
+                sorted(self.config.agent_webhook_ids) or "none",
+                self.config.channel_agent,
+            )
+            return
         if message.author.bot:
             return
         if not handlers.is_authorized(self.config, message.author.id, message.channel.id):

@@ -38,6 +38,7 @@ CONFIG = BotConfig(
     nudge_time=time(10, 0, tzinfo=TZ),
     export_time=time(3, 0, tzinfo=TZ),
     timezone=TZ,
+    agent_webhook_ids=frozenset({77}),
 )
 
 
@@ -47,6 +48,12 @@ class AuthorizationTests(TestCase):
         self.assertFalse(handlers.is_authorized(CONFIG, 999, 11))  # other user ignored
         self.assertFalse(handlers.is_authorized(CONFIG, 1, 555))  # other channel
         self.assertFalse(handlers.is_authorized(CONFIG, 1, None))  # DM
+
+    def test_trusted_webhook_in_agent_channel_only(self) -> None:
+        self.assertTrue(handlers.is_trusted_webhook(CONFIG, 77, 11))
+        self.assertFalse(handlers.is_trusted_webhook(CONFIG, 78, 11))  # unknown webhook
+        self.assertFalse(handlers.is_trusted_webhook(CONFIG, 77, 12))  # other channel
+        self.assertFalse(handlers.is_trusted_webhook(CONFIG, None, 11))  # not a webhook
 
 
 class DeterministicCommandTests(TestCase):

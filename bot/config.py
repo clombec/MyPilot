@@ -22,6 +22,15 @@ def _int(name: str) -> int:
     return int(raw)
 
 
+def _int_set(name: str) -> frozenset[int]:
+    """Read an optional comma-separated list of Discord ids from the environment."""
+    raw = os.environ.get(name, "").strip()
+    ids = [part.strip() for part in raw.split(",") if part.strip()]
+    if not all(part.isdigit() for part in ids):
+        raise ConfigError(f"{name} must be a comma-separated list of numeric Discord ids")
+    return frozenset(int(part) for part in ids)
+
+
 def _time(name: str, default: str, tz: ZoneInfo) -> time:
     """Read an HH:MM time from the environment."""
     raw = os.environ.get(name, "").strip() or default
@@ -47,6 +56,7 @@ class BotConfig:
     nudge_time: time
     export_time: time
     timezone: ZoneInfo
+    agent_webhook_ids: frozenset[int] = frozenset()
 
     @property
     def channels(self) -> set[int]:
@@ -81,4 +91,5 @@ class BotConfig:
             nudge_time=_time("BRIEFING_NUDGE_TIME", "10:00", tz),
             export_time=_time("EXPORT_TIME", "03:00", tz),
             timezone=tz,
+            agent_webhook_ids=_int_set("DISCORD_AGENT_WEBHOOK_IDS"),
         )

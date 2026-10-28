@@ -122,7 +122,7 @@ briefing, il est envoyé au démarrage du bot (avant midi).
 | Salon | Rôle |
 |---|---|
 | `#briefing` | point du matin (`BRIEFING_TIME`), relance douce à `BRIEFING_NUDGE_TIME` sans réponse |
-| `#agent` | dialogue libre avec l'agent (une conversation par jour, reprise toute la journée) |
+| `#agent` | dialogue libre avec l'agent (une conversation par jour, reprise toute la journée) ; accepte aussi les webhooks listés dans `DISCORD_AGENT_WEBHOOK_IDS` |
 | `#capture` | chaque message devient une tâche brute (`clab: texte` → projet CLAB) |
 | `#propositions` | consignes, profil, format, abandons proposés par l'agent : Accepter / Refuser |
 

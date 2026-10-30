@@ -1,8 +1,8 @@
 """
 mcp_server.py
 
-Local MCP server (stdio) named `pilotage`. It exposes the agent tools of
-core/agent_tools.py to Claude Code, which sees them as `mcp__pilotage__<tool>`.
+Local MCP server (stdio) named `clabpilot`. It exposes the agent tools of
+core/agent_tools.py to Claude Code, which sees them as `mcp__clabpilot__<tool>`.
 
 Started by Claude Code itself (see agent/workspace.py for the declaration).
 Nothing may be written to stdout except the MCP protocol: logs go to stderr
@@ -30,7 +30,7 @@ from mcp.server.mcpserver import MCPServer  # noqa: E402
 
 from core import agent_tools  # noqa: E402
 
-SERVER_NAME = "pilotage"
+SERVER_NAME = "clabpilot"
 
 INSTRUCTIONS = (
     "Outils de pilotage personnel : tâches, événements, journées, observations, notes, "

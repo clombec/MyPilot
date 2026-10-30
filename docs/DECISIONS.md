@@ -55,12 +55,12 @@ Format : décision, puis raison en une ou deux lignes. Les plus récentes en bas
 18. **Options de Claude Code vérifiées sur la version installée (2.1.310)** par `claude --help`
     et un essai réel. Retenu : `--tools ""` (coupe tous les outils intégrés, plus sûr qu'une
     liste d'interdictions qui oublierait un outil), `--permission-mode dontAsk` +
-    `--permission-prompts none`, `--strict-mcp-config`, `--allowedTools mcp__pilotage`,
+    `--permission-prompts none`, `--strict-mcp-config`, `--allowedTools mcp__clabpilot`,
     `--setting-sources project` (ni réglages, ni hooks, ni mémoire de l'utilisateur),
     `--disable-slash-commands`, `--no-chrome`. `--max-turns` n'est plus documenté mais reste
     accepté. Le message passe par l'entrée standard (pas de limite de longueur de la ligne de
     commande Windows).
-19. **Dossier de travail de l'agent hors du dépôt** (`~/.pilotage/agent_workspace`) : Claude
+19. **Dossier de travail de l'agent hors du dépôt** (`~/.clabpilot/agent_workspace`) : Claude
     Code lit les CLAUDE.md des dossiers parents, l'agent aurait sinon reçu les règles de
     développement. La source versionnée reste `agent_workspace/CLAUDE.md`, copiée au
     démarrage ; `mcp_config.json` est généré (chemins absolus propres à la machine). Une
@@ -86,7 +86,7 @@ Format : décision, puis raison en une ou deux lignes. Les plus récentes en bas
     manqué (PC éteint) envoyé au démarrage s'il est avant midi.
 25. **La relance de 10 h n'appelle pas Claude** : texte fixe, coût nul.
 26. **Boutons de validation gérés par `on_interaction`** sur un identifiant
-    `pilotage:proposal:<id>:<accept|reject>` : ils marchent encore après un redémarrage.
+    `clabpilot:proposal:<id>:<accept|reject>` : ils marchent encore après un redémarrage.
 27. **Un seul processus `claude` à la fois** (verrou asyncio dans le backend), une
     nouvelle tentative au plus sur échec ou délai dépassé ; jamais sur limite d'usage.
 28. **Démarrage automatique par tâches planifiées Windows** (et non un service) : un

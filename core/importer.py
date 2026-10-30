@@ -6,7 +6,7 @@ Import of a raw to-do pile: one non-empty line becomes one raw inbox task.
 Nothing is interpreted. The original line is kept verbatim in `raw_text`,
 the indentation is recorded in `notes`, and a provisional `parent` is set
 only when the indentation is explicit and unambiguous. The agent reclassifies
-everything later (see CLAUDE_pilotage.md §6).
+everything later (see CLAUDE_clabpilot.md §6).
 """
 
 import logging

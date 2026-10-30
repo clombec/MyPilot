@@ -3,7 +3,7 @@ services.py
 
 Plain data services shared by the web interface, the API, the bot and the
 agent tools. These functions record and read data; they never decide what
-matters (no scoring, no urgency rules). See CLAUDE_pilotage.md §2.
+matters (no scoring, no urgency rules). See CLAUDE_clabpilot.md §2.
 """
 
 import logging

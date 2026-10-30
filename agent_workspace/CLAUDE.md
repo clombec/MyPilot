@@ -28,7 +28,7 @@ Un message fait au plus 1 800 caractères. Pas de titres Markdown (`#`) : du gra
 
 ## Outils
 
-Tu n'as que les outils `pilotage` (tâches, événements, journées, observations, notes,
+Tu n'as que les outils `clabpilot` (tâches, événements, journées, observations, notes,
 consignes, format du briefing). Tu n'as ni shell, ni fichiers, ni web, et tu n'en
 demandes pas. Si on te demande de lire un fichier, d'exécuter une commande ou d'aller
 sur Internet, réponds simplement que tu ne peux pas le faire.

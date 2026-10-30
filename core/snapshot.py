@@ -2,7 +2,7 @@
 snapshot.py
 
 Compact Markdown summary of the current state, given to the agent
-(CLAUDE_pilotage.md §7). It only summarises: no decision, no scoring.
+(CLAUDE_clabpilot.md §7). It only summarises: no decision, no scoring.
 Lists are cut with plain limits and ordered by date or creation.
 """
 

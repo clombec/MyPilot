@@ -27,7 +27,9 @@ from .text import AGENT_ERROR_MESSAGES, split_message
 
 logger = logging.getLogger(__name__)
 
-CUSTOM_ID_PREFIX = "pilotage"
+CUSTOM_ID_PREFIX = "clabpilot"
+# Buttons posted before the rename to ClabPilot still carry the old prefix.
+KNOWN_CUSTOM_ID_PREFIXES = (f"{CUSTOM_ID_PREFIX}:", "pilotage:")
 CATCH_UP_UNTIL_HOUR = 12
 
 
@@ -72,7 +74,7 @@ class SpecRestoreView(discord.ui.View):
 
 
 class PilotBot(commands.Bot):
-    """The Pilotage Discord bot.
+    """The ClabPilot Discord bot.
 
     Attributes:
         config: Discord identifiers and schedule.
@@ -256,7 +258,7 @@ class PilotBot(commands.Bot):
         if interaction.type != discord.InteractionType.component:
             return
         custom_id = (interaction.data or {}).get("custom_id", "")
-        if not custom_id.startswith(f"{CUSTOM_ID_PREFIX}:"):
+        if not custom_id.startswith(KNOWN_CUSTOM_ID_PREFIXES):
             return
         if not handlers.is_authorized(self.config, interaction.user.id, interaction.channel_id):
             await interaction.response.send_message("Accès refusé.", ephemeral=True)

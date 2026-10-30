@@ -107,7 +107,7 @@ def seed(apps, schema_editor):
             content=INITIAL_BRIEFING_SPEC,
             source="initial",
             status="accepted",
-            instruction="Version initiale (CLAUDE_pilotage.md §8)",
+            instruction="Version initiale (CLAUDE_clabpilot.md §8)",
         )
 
 

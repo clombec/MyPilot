@@ -1,14 +1,14 @@
 """
 models.py
 
-Data models for Pilotage.
+Data models for ClabPilot.
 
 Layer 1 (facts): Project, Task, Event, DayLog, WorkSession, Note.
 Layer 2 (soft memory): Observation, ProfileVersion, Rule, BriefingSpecVersion.
 Cross-cutting: Proposal, Briefing, ConversationTurn, AuditLog.
 
 Models only store data. No prioritisation or business rule lives here:
-all planning is done by the agent (see CLAUDE_pilotage.md §2).
+all planning is done by the agent (see CLAUDE_clabpilot.md §2).
 """
 
 from django.db import models

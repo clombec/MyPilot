@@ -1,5 +1,5 @@
 {% extends "web/base.html" %}
-{% block title %}Note · Pilotage{% endblock %}
+{% block title %}Note · ClabPilot{% endblock %}
 {% block content %}
 <p><a href="{% url 'web:note_list' %}">← Notes</a></p>
 <h1>{% if note %}{{ note.title }}{% else %}Nouvelle note{% endif %}</h1>

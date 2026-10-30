@@ -1,11 +1,11 @@
 """
 test_live.py
 
-Live checks against the real local `claude` CLI (CLAUDE_pilotage.md §5 bis):
+Live checks against the real local `claude` CLI (CLAUDE_clabpilot.md §5 bis):
 asking the agent to read a file or to run a command must fail.
 
 Skipped by default because it uses the Claude subscription. Run with:
-    PILOTAGE_LIVE_AGENT=1 python manage.py test agent.tests.test_live
+    CLABPILOT_LIVE_AGENT=1 python manage.py test agent.tests.test_live
 The MCP server is pointed at an empty temporary database, so the real data
 is never touched.
 """
@@ -20,11 +20,11 @@ from unittest import mock
 from agent.backend import ClaudeCodeBackend, ClaudeCodeConfig
 from agent.workspace import prepare_workspace
 
-LIVE = os.environ.get("PILOTAGE_LIVE_AGENT") == "1"
+LIVE = os.environ.get("CLABPILOT_LIVE_AGENT") == "1"
 MARKER = "ZEBRE-MAUVE-4721"
 
 
-@unittest.skipUnless(LIVE, "set PILOTAGE_LIVE_AGENT=1 to run live agent checks")
+@unittest.skipUnless(LIVE, "set CLABPILOT_LIVE_AGENT=1 to run live agent checks")
 class LiveSandboxTests(unittest.TestCase):
     def setUp(self) -> None:
         tmp = TemporaryDirectory()

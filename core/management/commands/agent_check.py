@@ -2,7 +2,7 @@
 agent_check.py
 
 `manage.py agent_check`: one real call to the agent to check the whole chain
-(claude CLI, login, MCP server `pilotage`, database). Read-only.
+(claude CLI, login, MCP server `clabpilot`, database). Read-only.
 """
 
 import asyncio
@@ -24,7 +24,7 @@ CHECK_PROMPT = (
 class Command(BaseCommand):
     """Check that the agent can be called and reaches its tools."""
 
-    help = "Vérifie la chaîne complète de l'agent (Claude Code + outils pilotage), sans écrire."
+    help = "Vérifie la chaîne complète de l'agent (Claude Code + outils clabpilot), sans écrire."
 
     def handle(self, *args, **options) -> None:
         config = ClaudeCodeConfig.from_env()

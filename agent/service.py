@@ -5,7 +5,7 @@ Orchestration of agent calls for the bot: daily session, fresh context
 header, conversation history and briefings. Database work is synchronous
 (Django ORM) and wrapped with `sync_to_async`; the agent call itself is async.
 
-Continuity rules (CLAUDE_pilotage.md §5 bis):
+Continuity rules (CLAUDE_clabpilot.md §5 bis):
 - one Claude Code session per day, stored in DayLog.agent_session_id and
   resumed with --resume; a new day starts a new session;
 - the morning briefing always starts a fresh session, which then becomes

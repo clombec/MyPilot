@@ -1,7 +1,7 @@
 """
 settings.py
 
-Django settings for the Pilotage project.
+Django settings for the ClabPilot project.
 All secrets and machine-specific values come from environment variables,
 optionally loaded from a local `.env` file (never versioned).
 """
@@ -97,7 +97,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": Path(_env("DATABASE_PATH", str(BASE_DIR / "data" / "pilotage.sqlite3"))),
+        "NAME": Path(_env("DATABASE_PATH", str(BASE_DIR / "data" / "clabpilot.sqlite3"))),
         "OPTIONS": {
             "init_command": "PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL;",
             "transaction_mode": "IMMEDIATE",
@@ -156,7 +156,7 @@ LOGGING = {
         "console": {"class": "logging.StreamHandler", "formatter": "default"},
         "file": {
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": LOG_DIR / "pilotage.log",
+            "filename": LOG_DIR / "clabpilot.log",
             "maxBytes": 2_000_000,
             "backupCount": 5,
             "encoding": "utf-8",

@@ -3,10 +3,10 @@ backend.py
 
 Agent backends. The bot talks to an `AgentBackend`; the only implementation
 for now is `ClaudeCodeBackend`, which runs the local `claude` CLI in
-non-interactive mode (CLAUDE_pilotage.md §5 bis).
+non-interactive mode (CLAUDE_clabpilot.md §5 bis).
 
 Safety model: the agent gets no built-in tool at all (`--tools ""`), only the
-`pilotage` MCP tools, and anything not pre-approved is denied
+`clabpilot` MCP tools, and anything not pre-approved is denied
 (`--permission-mode dontAsk`, `--permission-prompts none`). Permission
 bypass modes are never used.
 """
@@ -24,8 +24,8 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-MCP_TOOL_PATTERN = "mcp__pilotage"
-DEFAULT_WORKDIR = Path.home() / ".pilotage" / "agent_workspace"
+MCP_TOOL_PATTERN = "mcp__clabpilot"
+DEFAULT_WORKDIR = Path.home() / ".clabpilot" / "agent_workspace"
 USAGE_LIMIT_MARKERS = ("usage limit", "rate limit", "limit reached", "limit will reset")
 SESSION_MISSING_MARKERS = ("no conversation found", "session not found")
 KILL_GRACE_SECONDS = 5

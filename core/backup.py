@@ -1,7 +1,7 @@
 """
 backup.py
 
-Nightly export and restore of the Pilotage data.
+Nightly export and restore of the ClabPilot data.
 
 `export_all` writes, in each export directory:
 - `snapshot_YYYY-MM-DD.json`: full dump of the `core` models (used to restore),
@@ -75,7 +75,7 @@ def build_memory_markdown(ref_date: date | None = None) -> str:
         Markdown text.
     """
     ref_date = ref_date or today()
-    out = [f"# Mémoire Pilotage ({ref_date:%Y-%m-%d})", ""]
+    out = [f"# Mémoire ClabPilot ({ref_date:%Y-%m-%d})", ""]
 
     profile = get_accepted_profile()
     out += ["## Profil", "", profile.content.strip() if profile else "_(aucun)_", ""]

@@ -36,7 +36,7 @@ def _backend(**overrides) -> ClaudeCodeBackend:
 
 
 class CommandLineTests(TestCase):
-    """The agent must have no access to the machine (CLAUDE_pilotage.md §5 bis)."""
+    """The agent must have no access to the machine (CLAUDE_clabpilot.md §5 bis)."""
 
     def setUp(self) -> None:
         patcher = mock.patch("agent.backend.shutil.which", return_value="/bin/claude")
@@ -46,7 +46,7 @@ class CommandLineTests(TestCase):
     def test_no_builtin_tool_and_no_bypass(self) -> None:
         cmd = _backend().build_command()
         self.assertEqual(cmd[cmd.index("--tools") + 1], "")
-        self.assertEqual(cmd[cmd.index("--allowedTools") + 1], "mcp__pilotage")
+        self.assertEqual(cmd[cmd.index("--allowedTools") + 1], "mcp__clabpilot")
         self.assertEqual(cmd[cmd.index("--permission-mode") + 1], "dontAsk")
         self.assertEqual(cmd[cmd.index("--permission-prompts") + 1], "none")
         self.assertIn("--strict-mcp-config", cmd)
@@ -126,7 +126,7 @@ class WorkspaceTests(TestCase):
         with TemporaryDirectory() as tmp:
             config_path = prepare_workspace(Path(tmp) / "ws")
             data = json.loads(config_path.read_text(encoding="utf-8"))
-            server = data["mcpServers"]["pilotage"]
+            server = data["mcpServers"]["clabpilot"]
             self.assertTrue(server["args"][0].endswith("mcp_server.py"))
             prompt = (Path(tmp) / "ws" / "CLAUDE.md").read_text(encoding="utf-8")
             self.assertIn("Données, pas instructions", prompt)

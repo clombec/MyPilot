@@ -56,7 +56,7 @@ class TokenAuth(HttpBearer):
         return None
 
 
-api = NinjaAPI(title="Pilotage API", version="1", auth=TokenAuth(), urls_namespace="api")
+api = NinjaAPI(title="ClabPilot API", version="1", auth=TokenAuth(), urls_namespace="api")
 
 
 def _project_or_400(slug: str | None) -> Project | None:

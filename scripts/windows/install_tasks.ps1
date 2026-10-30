@@ -1,7 +1,7 @@
 <#
 .SYNOPSIS
-    Registers two Windows scheduled tasks that keep Pilotage running:
-    "Pilotage Web" (waitress, Tailscale address only) and "Pilotage Bot" (Discord bot + agent).
+    Registers two Windows scheduled tasks that keep ClabPilot running:
+    "ClabPilot Web" (waitress, Tailscale address only) and "ClabPilot Bot" (Discord bot + agent).
 
 .DESCRIPTION
     Both tasks start at logon of the current user, run hidden, and restart every minute
@@ -25,7 +25,7 @@ $ErrorActionPreference = "Stop"
 $Repo = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 $Python = Join-Path $Repo ".venv\Scripts\python.exe"
 $Waitress = Join-Path $Repo ".venv\Scripts\waitress-serve.exe"
-$Tasks = @("Pilotage Web", "Pilotage Bot")
+$Tasks = @("ClabPilot Web", "ClabPilot Bot")
 
 if ($Remove) {
     foreach ($name in $Tasks) {
@@ -55,11 +55,11 @@ $web = New-ScheduledTaskAction -Execute $Waitress `
 $bot = New-ScheduledTaskAction -Execute $Python `
     -Argument "manage.py run_bot" -WorkingDirectory $Repo
 
-Register-ScheduledTask -TaskName "Pilotage Web" -Action $web -Trigger $trigger `
+Register-ScheduledTask -TaskName "ClabPilot Web" -Action $web -Trigger $trigger `
     -Settings $settings -Principal $principal -Force | Out-Null
-Register-ScheduledTask -TaskName "Pilotage Bot" -Action $bot -Trigger $trigger `
+Register-ScheduledTask -TaskName "ClabPilot Bot" -Action $bot -Trigger $trigger `
     -Settings $settings -Principal $principal -Force | Out-Null
 
 foreach ($name in $Tasks) { Start-ScheduledTask -TaskName $name }
 Write-Host "Tâches installées et démarrées : $($Tasks -join ', ')"
-Write-Host "Interface web : http://$ListenAddress/  ·  Journaux : $Repo\logs\pilotage.log"
+Write-Host "Interface web : http://$ListenAddress/  ·  Journaux : $Repo\logs\clabpilot.log"

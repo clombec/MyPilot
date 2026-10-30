@@ -1,5 +1,5 @@
 {% extends "web/base.html" %}
-{% block title %}#{{ task.pk }} · Pilotage{% endblock %}
+{% block title %}#{{ task.pk }} · ClabPilot{% endblock %}
 {% block content %}
 <p><a href="{% url 'web:task_list' %}">← Tâches</a></p>
 <h1>#{{ task.pk }} {{ task.title }}</h1>

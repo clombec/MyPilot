@@ -1,7 +1,7 @@
 """
 agent_tools.py
 
-Implementation of the tools exposed to the agent (CLAUDE_pilotage.md §5).
+Implementation of the tools exposed to the agent (CLAUDE_clabpilot.md §5).
 `agent/mcp_server.py` only wraps these functions; they are plain Python so
 they can be tested without Claude.
 

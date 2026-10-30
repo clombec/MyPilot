@@ -1,8 +1,8 @@
-# Pilotage
+# ClabPilot
 
 Coffre de données personnel + agent Claude + bot Discord pour piloter cinq activités
 (DrAB, Aure Tech, CLAB Services, CaBO, DrEB). Spécification complète :
-[`CLAUDE_pilotage.md`](CLAUDE_pilotage.md). Conventions de code : [`CLAUDE.md`](CLAUDE.md).
+[`CLAUDE_clabpilot.md`](CLAUDE_clabpilot.md). Conventions de code : [`CLAUDE.md`](CLAUDE.md).
 
 **Principe directeur** : le code enregistre, partage et montre les données. Il ne planifie
 rien. Toute la gestion (priorités, propositions, rappels, clarification) est faite par
@@ -13,7 +13,7 @@ Claude, via Claude Code exécuté en local (`claude -p`).
 | Phase | Contenu | État |
 |---|---|---|
 | 1 | Modèles, API, interface minimale, `import_raw`, `export_snapshot` / `restore`, tests | ✅ fait |
-| 2 | Bot Discord, serveur MCP `pilotage`, `ClaudeCodeBackend`, briefing, `/annuler`, propositions | ✅ fait |
+| 2 | Bot Discord, serveur MCP `clabpilot`, `ClaudeCodeBackend`, briefing, `/annuler`, propositions | ✅ fait |
 | 3 | Revue hebdo, résumés, mode Mac, `import_json` | à faire |
 
 Le catalogue des outils de l'agent est suivi dans `outils_agent.xlsx` (les 22 outils prévus
@@ -32,7 +32,7 @@ Pilot/
 ├── web/               interface web mobile (gabarits Django + HTMX)
 ├── docs/DECISIONS.md  décisions techniques
 ├── bot/               bot Discord : commandes, salons, boutons, planificateur
-├── agent/             serveur MCP `pilotage`, ClaudeCodeBackend, service (sessions)
+├── agent/             serveur MCP `clabpilot`, ClaudeCodeBackend, service (sessions)
 ├── agent_workspace/   CLAUDE.md = prompt système de l'agent (source versionnée)
 └── scripts/windows/   démarrage automatique (tâches planifiées)
 ```
@@ -60,7 +60,7 @@ Générer des secrets :
 .venv\Scripts\python -c "import secrets; print(secrets.token_urlsafe(48))"
 ```
 
-La base vit dans `data/pilotage.sqlite3` (mode WAL). **Ne jamais la placer dans un dossier
+La base vit dans `data/clabpilot.sqlite3` (mode WAL). **Ne jamais la placer dans un dossier
 synchronisé** (OneDrive, Google Drive) : seuls les exports y vont.
 
 ## Lancement
@@ -96,7 +96,7 @@ puis `/login`).
 ```
 
 Au démarrage, `run_bot` copie `agent_workspace/CLAUDE.md` et génère `mcp_config.json` dans
-`AGENT_WORKDIR` (par défaut `~/.pilotage/agent_workspace`). Ce dossier doit être **hors du
+`AGENT_WORKDIR` (par défaut `~/.clabpilot/agent_workspace`). Ce dossier doit être **hors du
 dépôt** : Claude Code lit les CLAUDE.md des dossiers parents, et les règles de développement
 ne doivent pas atteindre l'agent. Une valeur dans le dépôt est remplacée par le défaut, avec
 un avertissement dans le journal.
@@ -147,7 +147,7 @@ sans Claude continuent de marcher et le message saisi est conservé.
 ### Sécurité de l'agent
 
 L'agent est lancé avec `--tools ""` (aucun outil intégré : ni shell, ni fichiers, ni web),
-`--strict-mcp-config` (seul le serveur `pilotage`), `--permission-mode dontAsk` et
+`--strict-mcp-config` (seul le serveur `clabpilot`), `--permission-mode dontAsk` et
 `--permission-prompts none` (tout ce qui n'est pas autorisé d'avance est refusé). Aucun mode
 de contournement des permissions. `ANTHROPIC_API_KEY`, le jeton Discord, `API_TOKEN` et la
 clé Django sont retirés de son environnement (`AGENT_AUTH=subscription`). Chaque écriture
@@ -208,7 +208,7 @@ ni les sessions.
 Tests réels de l'agent (consomment un peu d'usage, base temporaire vide) :
 
 ```powershell
-$env:PILOTAGE_LIVE_AGENT="1"; .venv\Scripts\python manage.py test agent.tests.test_live
+$env:CLABPILOT_LIVE_AGENT="1"; .venv\Scripts\python manage.py test agent.tests.test_live
 ```
 
 Critères d'acceptation de la phase 1 couverts par les tests :

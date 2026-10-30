@@ -34,10 +34,10 @@ class WorkspaceError(Exception):
 
 
 def build_mcp_config() -> dict:
-    """Return the MCP declaration of the `pilotage` server for this machine."""
+    """Return the MCP declaration of the `clabpilot` server for this machine."""
     return {
         "mcpServers": {
-            "pilotage": {
+            "clabpilot": {
                 "type": "stdio",
                 "command": sys.executable,
                 "args": [str(MCP_SERVER_SCRIPT)],
